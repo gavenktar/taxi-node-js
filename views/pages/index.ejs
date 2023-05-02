@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<title>Подвезем - такси нового поколения</title>
+<link rel="stylesheet" href="/css/index.css">
+
+<body>
+<%- include('./parts/header.ejs') %>
+
+<section class="hero">
+    <div class="hero__container">
+        <div id="videodiv">
+            <h1 class="hero__title">Закажите такси в один клик</h1>
+            <p class="hero__subtitle">Быстро, удобно и надежно</p>
+            <button class="hero__button">Заказать поездку</button>
+        </div>
+        <div id="videodiv1">
+        <video autoplay muted loop id="myVideo">
+            <source src="/video/TaxiRide.mp4" type="video/mp4">
+        </video>
+        </div>
+
+    </div>
+</section>
+
+<section class="services">
+    <div class="services__container">
+        <div class="services__item">
+            <h2 class="services__title">Мы индвидуальны</h2>
+            <p class="services__description">Мы не являемся агрегатором такси, вас довозят люди по примеру "попуток" </p>
+        </div>
+        <div class="services__item">
+            <h2 class="services__title">Низкие цены</h2>
+            <p class="services__description">Наши водители едут с вами по одному маршруту, что дает возможность им подзаработать, а вам сэкономить на такси</p>
+        </div>
+        <div class="services__item">
+            <h2 class="services__title">Бронирование поездок</h2>
+            <p class="services__description">Вы бронируете такси, что дает вам уверенность что машина будет подана точно в срок</p>
+        </div>
+    </div>
+</section>
+
+<section class="about">
+    <div class="about__container">
+        <h2 class="about__title">Попробуйте сервис "попутки" </h2>
+        <p class="about__description">Мы предоставляем вам удобный способ путешествия между городами за сущие копейки.</p>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="cta__container">
+        <h2 class="cta__title">Готовы заказать такси?</h2>
+        <button class="cta__button">Заказать такси</button>
+    </div>
+</section>
+
+<%- include('./parts/footer.ejs') %>
+</body>
+</html>

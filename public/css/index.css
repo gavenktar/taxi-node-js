@@ -1,0 +1,293 @@
+
+body{
+    margin: 0px;
+}
+
+#gray{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    background-color: rgba(1,1,1,0.75);
+    z-index: 100;
+    display: none;
+}
+
+#window{
+    color: black;
+    border: 1px solid black;
+    width: 350px;
+    height: 550px;
+    background: white;
+    margin: 40px auto;
+    border-radius: 15px;
+    z-index: 150;
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.closereg{
+    width: 15px;
+    margin: 15px 0px 0px 320px;
+}
+
+.closereg:hover{
+    background-color: #ddd;
+    cursor: pointer;
+}
+
+
+.form{
+    text-align: center;
+    font-color: black;
+}
+.input{
+    height: 30px;
+    width: 260px;
+    padding: 5px;
+}
+#videodiv{
+    position: absolute;
+    left: 30%;
+    top: 40%;
+    z-index: 2;
+    opacity: 100%;
+}
+
+#myVideo{
+    position: relative;
+    width: 100%;
+    opacity: 50%;
+    z-index: 1;
+    margin-top: -120px;
+    margin-bottom: -120px;
+}
+
+footer {
+    background-color: #2b2d42;
+    color: #fff;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.hero__container{
+    position: relative;
+}
+.footer__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer__logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer__links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer__link {
+    font-size: 16px;
+    margin: 0 10px;
+    color: #fff;
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+.footer__link:hover {
+    opacity: 1;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #4a4e69;
+    color: #fff;
+    padding: 10px 20px;
+    flex-direction: row;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar1 {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.navbar__logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: auto;
+    color: #fff;
+    text-decoration: none;
+}
+
+.navbar__link {
+    font-size: 18px;
+    margin: 0 10px;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+.navbar__link--login {
+    align-self: flex-end;
+
+    background-color: #ff6b6b;
+}
+
+.navbar__link--driver {
+    justify-content: flex-end;
+    background-color: #70c1b3;
+}
+
+.navbar__link:hover {
+    opacity: 0.8;
+}
+
+.navbar__link--login:hover {
+    background-color: #ee4d4d;
+    cursor: pointer;
+}
+
+.navbar__link--driver:hover {
+    background-color: #52b788;
+}
+
+body {
+    background-color: #f2f2f2;
+    font-family: Arial, sans-serif;
+}
+
+#videodiv1{
+    width: 100%;
+    overflow:hidden;
+    display:block;
+    height: 30%;
+}
+
+/* Стили для секции Hero */
+.hero {
+    background-color: #2d2d2d;
+    color: #fff;
+    padding: 0px;
+    text-align: center;
+}
+
+.hero__title {
+    font-size: 48px;
+    margin: 0 0 20px 0;
+}
+
+.hero__subtitle {
+    font-size: 24px;
+    margin: 0 0 40px 0;
+}
+
+.hero__button {
+    background-color: #fff;
+    border: none;
+    border-radius: 5px;
+    color: #2d2d2d;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 15px 25px;
+    transition: background-color 0.3s ease;
+}
+
+.hero__button:hover {
+    background-color: #ddd;
+}
+
+/* Стили для секции Services */
+.services {
+    padding: 50px 0;
+    text-align: center;
+}
+
+.services__item {
+    display: inline-block;
+    margin: 0 20px;
+    max-width: 300px;
+}
+
+.services__icon {
+    height: 80px;
+    margin-bottom: 20px;
+}
+
+.services__title {
+    font-size: 24px;
+    margin: 0 0 10px 0;
+}
+
+.services__description {
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Стили для секции About */
+.about {
+    background-color: #fff;
+    padding: 50px;
+    text-align: center;
+}
+
+.about__title {
+    font-size: 36px;
+    margin: 0 0 20px 0;
+}
+
+.about__description {
+    font-size: 18px;
+    margin: 0;
+}
+
+/* Стили для секции CTA */
+.cta {
+    background-color: #2d2d2d;
+    color: #fff;
+    padding: 50px;
+    text-align: center;
+}
+
+.cta__title {
+    font-size: 48px;
+    margin: 0 0 20px 0;
+}
+
+.cta__button {
+    background-color: #fff;
+    border: none;
+    border-radius: 5px;
+    color: #2d2d2d;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 15px 25px;
+    transition: background-color 0.3s ease;
+}
+
+.cta__button:hover {
+    background-color: #ddd;
+}

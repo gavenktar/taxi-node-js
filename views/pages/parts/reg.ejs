@@ -1,0 +1,85 @@
+
+<link rel="stylesheet" href="/css/index.css">
+<div id="gray">
+</div>
+<div id="window">
+  <img src="/img/close.png" class="closereg" onclick="closereg()">
+  <center style ="margin-bottom: 20px; margin-top: 10px; font-color:black;">Регистрация</center>
+  <form name="registration" id="reg" class="form">
+    <input type="text" placeholder="Имя" name="name" class="input" required>
+    <input type="text" placeholder="Фамилия" name="surname" class="input" required>
+    <input type="email" placeholder="Электронная почта" name="email" class="input" required>
+    <input type='tel' placeholder="Мобильный телефон" name="number" class="input" required>
+    <input type="password" placeholder="Пароль" name="password" class="input" required>
+    <input type="date" style="margin-bottom: 5px" placeholder="Дата рождения" name="dateOfBirth" class="input" required>
+    <br>
+    Ваш пол
+    <br>
+    <input type="radio" name="sex" value="MAN" required> Мужчина <input type="radio" name="sex" value="WOMAN" class="radio" required> Женщина
+    <br>
+    <input type="submit" value="Регистрация" name="sab" style="border-radius: 10px; height: 50px; background-color: #52b788" class="input" >
+  </form>
+</div >
+<script>
+  let a =0
+  formelement =document.getElementById("reg");
+  formelement.addEventListener("submit",submitting);
+  async function  submitting(){
+    if (a===1){
+    formelement.removeChild(formelement.firstChild);
+    }
+    a=0;
+
+    event.preventDefault();
+    const formData =new FormData(formelement);
+    data = {};
+    for (let [key, value] of formData.entries()) {
+      data[key] = value;
+    }
+    if (data.name.length < 2 || data.surname.length<2){
+      let attention = document.createElement("div");
+      attention.innerHTML = "Проверьте введенные имя и фамилию"
+      formelement.insertBefore(attention,formelement.firstChild);
+      a=1;
+    }
+    var now = new Date();
+    var usdate = new Date(data.dateOfBirth);
+    var daysLag = Math.ceil(Math.abs(now.getTime() - usdate.getTime()) / (1000 * 3600 * 24*365));
+    if (daysLag<6 || usdate>now){
+      let attention = document.createElement("div");
+      attention.innerHTML = "Проверьте дату рождения"
+      formelement.insertBefore(attention,formelement.firstChild);
+      a=1;
+    }
+    if (data.password.length <4){
+      let attention = document.createElement("div");
+      attention.innerHTML = "Пароль должен быть как минимум 4 символа"
+      formelement.insertBefore(attention,formelement.firstChild);
+      a=1;
+    }
+    if (a==0){
+        const res = await fetch('http://127.0.0.1:4444/registration',{
+          method : 'POST',
+          headers:{
+            'Content-Type' : 'application/json'
+          },
+          body:JSON.stringify(data)
+        });
+      const deb = await res.json();
+      let attention = document.createElement("div");
+
+      attention.innerHTML = deb.message;
+      if (deb.message!= undefined){
+      formelement.insertBefore(attention,formelement.firstChild);
+      a=1;
+        }
+    }
+  }
+
+  function closereg(){
+    document.getElementById("window").style.display="none";
+    document.getElementById("gray").style.display="none";
+  }
+
+</script>
+</html>
