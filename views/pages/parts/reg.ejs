@@ -4,7 +4,10 @@
 </div>
 <div id="window">
   <img src="/img/close.png" class="closereg" onclick="closereg()">
-  <center style ="margin-bottom: 20px; margin-top: 10px; font-color:black;">Регистрация</center>
+  <div id="regbuttons" style="text-align: center; margin-bottom: 20px">
+  <a class="reg" id="regbutton" onclick="showreg()">Регистрация</a>
+  <a class="reg" id ="loginbutton" onclick="showlogin()" >Войти</a>
+</div>
   <form name="registration" id="reg" class="form">
     <input type="text" placeholder="Имя" name="name" class="input" required>
     <input type="text" placeholder="Фамилия" name="surname" class="input" required>
@@ -19,66 +22,144 @@
     <br>
     <input type="submit" value="Регистрация" name="sab" style="border-radius: 10px; height: 50px; background-color: #52b788" class="input" >
   </form>
+  <form name="login" id="log" class="form">
+    <input type='tel' placeholder="Мобильный телефон" name ="number" class="input" required>
+    <input type ='password' placeholder="Пароль" name="password" style="margin-bottom: 20px" class="input" required>
+    <br>
+    <input type="submit" value="Войти" name="sab" style="border-radius: 10px; height: 50px; background-color: #52b788" class="input" >
+  </form>
 </div >
 <script>
+
+
+
   let a =0
   formelement =document.getElementById("reg");
   formelement.addEventListener("submit",submitting);
-  async function  submitting(){
-    if (a===1){
-    formelement.removeChild(formelement.firstChild);
-    }
-    a=0;
+  document.getElementById("log").addEventListener("submit",login);
 
+  function showlogin(){
+    if (a===1){
+      document.getElementById("regbuttons").removeChild(document.getElementById("regbuttons").lastChild);
+      a=0;}
+
+      document.getElementById("loginbutton").style.backgroundColor = "#ddd";
+      document.getElementById("regbutton").style.backgroundColor = "#fff";
+    document.getElementById("log").style.display = "block";
+      formelement.style.display = "none";
+      document.getElementById("window").style.height="300px";
+  }
+
+async  function login(){
+      event.preventDefault();
+      let loginelement = document.getElementById("log");
+      let formData =new FormData(loginelement);
+      let data = {};
+      for (let [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+      let aboba = "http://127.0.0.1:4444/login";
+      let json = 'application/json';
+      const resl = await fetch(aboba,{
+        method : 'POST',
+        headers:{
+          'Content-Type' : json
+        },
+        body:JSON.stringify(data)
+      });
+      let result = await resl.json();
+      if (result.message !== undefined){
+          showmessage(result.message);
+      }else {
+        setcookie("JWT", result.token);
+        setcookie("name",result.name);
+        onlogin(result.name);
+      }
+  }
+  function showmessage(message){
+    if (a===1){
+      document.getElementById("regbuttons").removeChild(document.getElementById("regbuttons").lastChild);
+      a=0;
+    }
+        let attention = document.createElement("div");
+        attention.innerHTML = message;
+        document.getElementById("regbuttons").append(attention);
+        a=1;
+  }
+
+  function showreg(){
+    document.getElementById("regbutton").style.backgroundColor = "#ddd";
+    document.getElementById("loginbutton").style.backgroundColor = "#fff";
+    document.getElementById("log").style.display = "none";
+    document.getElementById("window").style.height = "550px"
+    formelement.style.display = "block";
+    if (a===1){
+      document.getElementById("regbuttons").removeChild(document.getElementById("regbuttons").lastChild);
+      a=0;}
+  }
+
+  async function  submitting(){
     event.preventDefault();
-    const formData =new FormData(formelement);
+    let formData =new FormData(formelement);
     data = {};
     for (let [key, value] of formData.entries()) {
       data[key] = value;
     }
     if (data.name.length < 2 || data.surname.length<2){
-      let attention = document.createElement("div");
-      attention.innerHTML = "Проверьте введенные имя и фамилию"
-      formelement.insertBefore(attention,formelement.firstChild);
-      a=1;
+        showmessage("Проверьте имя и фамилию пж");
     }
     var now = new Date();
     var usdate = new Date(data.dateOfBirth);
     var daysLag = Math.ceil(Math.abs(now.getTime() - usdate.getTime()) / (1000 * 3600 * 24*365));
     if (daysLag<6 || usdate>now){
-      let attention = document.createElement("div");
-      attention.innerHTML = "Проверьте дату рождения"
-      formelement.insertBefore(attention,formelement.firstChild);
-      a=1;
+      showmessage("Проверьте дату рождения");
     }
     if (data.password.length <4){
-      let attention = document.createElement("div");
-      attention.innerHTML = "Пароль должен быть как минимум 4 символа"
-      formelement.insertBefore(attention,formelement.firstChild);
-      a=1;
+      showmessage("Проверьте должен содержать не менее 4 символов");
     }
     if (a==0){
-        const res = await fetch('http://127.0.0.1:4444/registration',{
+      let aboba = "http://127.0.0.1:4444/registration";
+      let json = 'application/json';
+        let res = await fetch(aboba,{
           method : 'POST',
           headers:{
-            'Content-Type' : 'application/json'
+            'Content-Type' : json
           },
           body:JSON.stringify(data)
         });
       const deb = await res.json();
-      let attention = document.createElement("div");
-
-      attention.innerHTML = deb.message;
+      if (res.message!==undefined){
+      showmessage(res.message);
+      }
+      setcookie("JWT",deb.token);
+      setcookie("name",deb.name);
       if (deb.message!= undefined){
       formelement.insertBefore(attention,formelement.firstChild);
       a=1;
-        }
+        }else{
+          onlogin(deb.name);
+      }
     }
   }
 
   function closereg(){
     document.getElementById("window").style.display="none";
     document.getElementById("gray").style.display="none";
+  }
+
+  function setcookie(name, value){
+    document.cookie = name+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+    let day = new Date();
+    let cookie_expired = new Date();
+    cookie_expired.setMinutes(day.getMinutes()+15);
+    document.cookie = name+"="+value+";"+"max-age="+cookie_expired;
+  }
+
+  function onlogin (number){
+    closereg();
+    document.getElementById("loginbuttons").style.display="none";
+    document.getElementById("usermenu").innerHTML = "Здравствуйте, " + number;
+    document.getElementById("usermenu").style.display="block";
   }
 
 </script>

@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html>
-<meta charset="utf-8">
-<title>Подвезем - такси нового поколения</title>
-<link rel="stylesheet" href="/css/index.css">
 
-<body>
 <%- include('./parts/header.ejs') %>
 
 <section class="hero">
@@ -12,7 +6,7 @@
         <div id="videodiv">
             <h1 class="hero__title">Закажите такси в один клик</h1>
             <p class="hero__subtitle">Быстро, удобно и надежно</p>
-            <button class="hero__button">Заказать поездку</button>
+            <button class="hero__button" onclick="makerequest('')">Заказать поездку</button>
         </div>
         <div id="videodiv1">
         <video autoplay muted loop id="myVideo">
@@ -50,10 +44,12 @@
 <section class="cta">
     <div class="cta__container">
         <h2 class="cta__title">Готовы заказать такси?</h2>
-        <button class="cta__button">Заказать такси</button>
+        <button class="cta__button" onclick="makerequest('newroute')">Заказать такси</button>
     </div>
 </section>
 
 <%- include('./parts/footer.ejs') %>
 </body>
+
+
 </html>

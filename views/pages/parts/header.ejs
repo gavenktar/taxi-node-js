@@ -1,22 +1,44 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<title>Подвезем - такси нового поколения</title>
+<link rel="stylesheet" href="/css/index.css">
 
+<body>
 <header>
     <%- include('reg.ejs') %>
     <nav class="navbar">
-       <a href="/" class="navbar__logo"> <img src="/img/logo.png" alt="Главная" width="120px"></a>
-        <a href="/about" class="navbar__link">О нас</a>
-        <a href="/order" class="navbar__link">Заказать авто</a>
+       <a onclick="makerequest('auth/me')" class="navbar__logo"> <img src="/img/logo.png" alt="Главная" width="120px"></a>
+        <a onclick="makerequest('/')" class="navbar__link">О нас</a>
+        <a onclick="makerequest('newroute')" class="navbar__link">Заказать авто</a>
     </nav>
-    <nav class = "navbar1">
+    <nav id="loginbuttons" class = "navbar1">
         <a onclick="show()" class="navbar__link navbar__link--login">Войти/Зарегистрироваться</a>
         <a href="/driver" class="navbar__link navbar__link--driver">Создать учетную запись водителя</a>
-        <nav>
+    </nav>
+            <a onclick="makerequest('/auth/me')" id="usermenu" style="display: none" class = "navbar__link navbar__link--login"></a>
 </header>
 
 
 <script>
+
+    window.addEventListener('load', () => {
+        try{
+            let name = document.cookie.match(/name=(.+?)(;|$)/)[1]
+            onlogin(name);
+        }
+        catch (e){
+
+        }
+    });
+
+
     function show(){
+        showreg();
+        document.getElementById("log").style.display = "none";
         document.getElementById("window").style.display = "block";
         document.getElementById("gray").style.display="block";
+        document.getElementById("window").style.height = "550px;"
     }
 
 </script>

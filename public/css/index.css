@@ -164,6 +164,7 @@ header {
 
 .navbar__link:hover {
     opacity: 0.8;
+    cursor: pointer;
 }
 
 .navbar__link--login:hover {
@@ -290,4 +291,15 @@ body {
 
 .cta__button:hover {
     background-color: #ddd;
+}
+
+.reg{
+    margin-bottom: 20px; margin-top: 10px;
+    width: 50px;
+    margin-right: 20px;
+}
+
+.reg:hover{
+    background-color: #ddd;
+    cursor: pointer;
 }

@@ -23,6 +23,10 @@ export const createRoute = async (req, res) =>{
     }
 }
 
+
+export const newroute = async (req,res)=>{
+        res.render('pages/newroute');
+}
 export const getRoutes = async (req, res)=>{
     try{
         const routes = await RouteSchema.find().populate('passengerID').exec();

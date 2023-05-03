@@ -1,10 +1,11 @@
 import express from 'express'
-import checkAuth from "./utility/checkAuth.js";
+import checkAuth, {returnID} from "./utility/checkAuth.js";
 import mongoose from 'mongoose'
 import {register, login, me,registerdriver} from "./Functions/UserFunc.js";
-import {createRoute, getRoutes, getRoutesId, deleteRoute, takeRoute} from "./Functions/routes.js";
+import {createRoute, getRoutes, getRoutesId, deleteRoute, takeRoute,newroute} from "./Functions/routes.js";
 import path from 'path'
 import { fileURLToPath } from 'url';
+import UserSchema from "./models/user.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,8 +15,23 @@ app.use(express.json());
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname,'public')));
 
-app.get('/',(req,res)=>{
-    res.render('pages/index')
+app.get('/',async (req,res)=>{
+    let data = {};
+    try {
+        let id = returnID(req.headers.authorization);
+        const User = await UserSchema.findById(id);
+        let result = User.toJSON();
+        data ={
+        number : result.number
+        }
+        res.render('pages/index',data)
+    }catch(err){
+        data = {
+            number : "Иван"
+        }
+        res.render('pages/index',data);
+    }
+
 })
 
 
@@ -30,16 +46,14 @@ app.listen(port,(err)=>{
 });
 app.post ('/regdriver',registerdriver);
 app.post ('/login', login);
-app.get ('/login', (req, res)=>{
-    res.render('pages/parts/reg');
-})
-app.get('/auth/me',me);
+app.get('/auth/me',checkAuth,me);
 app.post('/registration',register);
 app.post('/route',checkAuth,createRoute);
 app.get('/route/',getRoutes);
 app.get ('/route/:id',getRoutesId);
 app.delete('/route/:id',checkAuth,deleteRoute);
 app.patch ('/route/:routeid',checkAuth,takeRoute);
+app.get('/newroute', newroute);
 
 const dbadress = "mongodb://127.0.0.1:27017/taxi";
 mongoose.connect(dbadress)

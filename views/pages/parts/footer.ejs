@@ -8,3 +8,30 @@
         </div>
     </div>
 </footer>
+
+<script>
+    async function makerequest (address){
+        let link = "http://127.0.0.1:4444/"+address;
+        let token
+        try {
+            token = document.cookie.match(/JWT=(.+?)(;|$)/)[1]
+        }catch (error){
+            token ="undefined";
+        }
+
+        let resd = await fetch(link,{
+            method : 'GET',
+            headers:{
+                'Content-Type' : 'application/json',
+                'Authorization' : 'Bearer '+token,
+            },
+            redirect: 'follow',
+        }).then (response => {
+            if (response){
+                window.location.href=link;
+            }
+        });
+        console.log(resd.json());
+    }
+
+</script>
