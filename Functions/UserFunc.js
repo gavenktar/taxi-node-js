@@ -19,6 +19,7 @@ export const register = async (req,res)=>{
             sex: req.body.sex,
             role: 'passenger',
         })
+
         const user = await doc.save();
         const token = jwt.sign({
             _id: user._id,
@@ -27,6 +28,8 @@ export const register = async (req,res)=>{
             ...user.toJSON(),
             token});
         res.status(200);
+        res.cookie('name', user.toJSON().name);
+        res.cookie('jwt',token);
     }catch (err){
         res.status(500).json({message: "Не удалось зарегистрироваться((",});
 
@@ -61,6 +64,8 @@ export const registerdriver = async (req,res)=>{
             ...user.toJSON(),
             token});
         res.status(200).json({message:"Вы успешно зарегистрированы!"});
+        res.cookie('name', user.toJSON().name);
+        res.cookie('jwt',token);
     }catch (err){
         res.status(500).json({message: "Не удалось зарегистрироваться((",});
     }
@@ -80,6 +85,8 @@ export const login = async (req, res)=>{
             const token = jwt.sign({
                 _id: User._id,
             },'aboba')
+            res.cookie('name', User.toJSON().name);
+            res.cookie('jwt',token);
             res.json({
                 ...User.toJSON(),
                 token});

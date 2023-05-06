@@ -71,8 +71,6 @@ async  function login(){
       if (result.message !== undefined){
           showmessage(result.message);
       }else {
-        setcookie("JWT", result.token);
-        setcookie("name",result.name);
         onlogin(result.name);
       }
   }
@@ -131,8 +129,6 @@ async  function login(){
       if (res.message!==undefined){
       showmessage(res.message);
       }
-      setcookie("JWT",deb.token);
-      setcookie("name",deb.name);
       if (deb.message!= undefined){
       formelement.insertBefore(attention,formelement.firstChild);
       a=1;

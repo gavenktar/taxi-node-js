@@ -6,11 +6,12 @@ import {createRoute, getRoutes, getRoutesId, deleteRoute, takeRoute,newroute} fr
 import path from 'path'
 import { fileURLToPath } from 'url';
 import UserSchema from "./models/user.js";
-
+import cookieParser from 'cookie-parser';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
+app.use(cookieParser())
 app.use(express.json());
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname,'public')));

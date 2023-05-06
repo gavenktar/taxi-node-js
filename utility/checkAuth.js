@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken'
+import cookieParser from "cookie-parser";
 
 export default (req,res,next)=>{
-    const token = (req.headers.authorization || '');
+    const token = (req.cookies.jwt || '');
     if (token){
         try {
             req.userId = returnID(token);
