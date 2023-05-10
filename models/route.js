@@ -18,7 +18,6 @@ const RouteSchema = new mongoose.Schema({
     driverID:{
         type : mongoose.Schema.Types.ObjectId,
         ref : 'User',
-        required: true,
     },
     time:{
         type : Date,

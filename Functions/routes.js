@@ -17,6 +17,7 @@ export const createRoute = async (req, res) =>{
         })
         const newRoute = await doc.save()
         res.json(newRoute);
+        res.status(200);
     }catch (e){
         console.log(e)
         res.status(500).json({message: "Не удалось создать поездку((",});
@@ -29,8 +30,55 @@ export const newroute = async (req,res)=>{
 }
 export const getRoutes = async (req, res)=>{
     try{
-        const routes = await RouteSchema.find().populate('passengerID').exec();
-        res.json(routes);
+        const routes = await RouteSchema.find().populate('passengerID').populate('driverID').exec();
+        let data = [];
+        let i =0;
+        for (let elem of routes){
+            if (elem.driverID !== undefined) {
+                data[i] = {
+                    from: elem.from,
+                    to: elem.to,
+                    time: elem.time,
+                    distance: elem.distance,
+                    price: elem.price,
+                    passengerID: {
+                        name: elem.passengerID.name,
+                        surname: elem.passengerID.surname
+                    },
+                    driverID: {
+                        name: elem.driverID.name || "Не",
+                        surname: elem.driverID.surname || "задан"
+                    }
+                }
+            }else{
+                data[i] = {
+                    from: elem.from,
+                    to: elem.to,
+                    time: elem.time,
+                    distance: elem.distance,
+                    price: elem.price,
+                    passengerID: {
+                        name: elem.passengerID.name,
+                        surname: elem.passengerID.surname
+                    },
+                    driverID: {
+                        name: "Не",
+                        surname: "Задан"
+                    }
+                }
+            }
+
+            i+=1
+        }
+        for (let i=0; i<routes.length;i++){
+            if (routes[i].driverID === undefined){
+                routes[i].driverID = {
+                    name : "Не",
+                    surname : "Задан"
+                }
+            }
+        }
+        res.render('pages/routes',{trips: data});
     }catch (e){
         console.log(e)
         res.status(500).json({message: "Не удалось получить поездки((",});
