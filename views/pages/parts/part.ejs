@@ -1,0 +1,59 @@
+<style>
+    *{
+        font-family: "Lora","Arial",serif;
+        font-variant: normal;
+        font-feature-settings: normal;
+    }
+    #aboutblock {
+        flex-basis: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .info-block {
+        flex: 1 0 30%;
+        margin: 0px;
+    }
+
+    .info-block h3 {
+        margin-top: 0;
+        margin-bottom: 0;
+        font-size: 1em;
+        font-weight: bold;
+    }
+
+    .info-block p {
+        margin-top: 0;
+        margin-bottom: 6px;
+        font-size: 1em;
+    }
+    </style>
+<script>
+
+async function showblock(id){
+    try {
+        try {
+            document.getElementById("aboutblock").remove();
+        }catch (error){};
+        let resultedblock = await fetch("../route/" + id);
+        let resultjson = await resultedblock.json();
+        let passenger = resultjson.passengerID;
+        let driver = resultjson.driverID;
+        document.getElementById(id).insertAdjacentHTML("afterend", '<div id="aboutblock"><div class="info-block"><h3>Номер пассажира:</h3><p id="pasnumber"></p></div><div class="info-block"><h3>Информация о водителе</h3><h3>Водитель: </h3><p id="drivername"></p><h3>Марка автомобиля</h3><p id="carmodel"></p><h3>Номер автомобиля</h3><p id="carnumber"></p><h3> Номер телефона водителя</h3><p id="drivernumber"></p></div></div>');
+        document.getElementById("pasnumber").innerHTML = passenger.number;
+        document.getElementById("drivername").innerHTML = driver.name+ driver.surname;
+        document.getElementById("carmodel").innerHTML = driver.carModel || "";
+        document.getElementById("carnumber").innerHTML = driver.carNumber ||"";
+        document.getElementById("drivernumber").innerHTML = driver.number;
+
+    }catch (error){
+        console.log(error);
+    }
+    function close (id){
+        document.getElementById(id).removeChild(document.getElementById("aboutblock"));
+    }
+}
+
+
+</script>

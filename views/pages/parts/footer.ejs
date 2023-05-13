@@ -1,3 +1,7 @@
+<style>
+
+</style>
+
 <footer>
     <div class="footer__container">
         <div class="footer__links">
@@ -8,10 +12,10 @@
         </div>
     </div>
 </footer>
-
+</body>
 <script>
     async function makerequest (address){
-        let link = "http://127.0.0.1:4444/"+address;
+        let link = "http://127.0.0.1:4444"+address;
         let token
         try {
             token = document.cookie.match(/JWT=(.+?)(;|$)/)[1]

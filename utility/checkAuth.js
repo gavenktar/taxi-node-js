@@ -7,15 +7,11 @@ export default (req,res,next)=>{
         try {
             req.userId = returnID(token);
         }catch (e){
-            return res.status(403).json({
-                message: 'Нет доступа',
-            });
+            return res.redirect("../");
         }
         next();
     }else{
-        return res.status(403).json({
-        message: 'Нет доступа',
-        });
+        return res.redirect("../");
     }
 }
 

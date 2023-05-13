@@ -1,0 +1,149 @@
+<%- include('./parts/header.ejs')%>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        *{
+            font-family: "Lora","Arial",serif;
+            font-variant: normal;
+            font-feature-settings: normal;
+        }
+        .container {
+            display: flex;
+            height: 85vh;
+        }
+
+        .menu {
+            background-color: #EEE;
+            flex: 1;
+            width: 15%;
+            max-width: 15%;
+        }
+
+        .content {
+            background-color: #DDD;
+            flex: 3;
+            display: flex;
+            justify-content: center;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #CCC;
+        }
+
+        a:hover {
+            color: #f65151;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+#form{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+        a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        li:hover {
+            color: #000;
+            cursor: pointer;
+        }
+        font{
+        font-size: 18em;
+        }
+
+        .active {
+            font-color: #f65151;
+        }
+    </style>
+<div class="container">
+    <div class="menu">
+        <ul>
+            <li class="menu-link active"><a href="#" >Изменить данные</a></li>
+            <li class="menu-link"><a href="../profile/routes" >Просмотреть поездки</a></li>
+            <% if (role === "driver") {%>
+            <li class="menu-link"><a href="../driver/routes">Просмотреть поездки (для водителя)
+                    <% }%>
+                    <% if (role === "admin") {%>
+            <li class="menu-link"><a href="#">Статистика
+                    <% }%>
+            <li class="menu-link"><a href="#">Выйти</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <form id = "formA" style="align-content: center; border: 1px solid black; height:35em; margin-top: 2em; padding: 1em; border-radius: 1em">
+            <p>Имя </p> <input class="input" id="iname" type="text">
+            <p> Фамилия</p> <input class="input" id="isurname" type="text">
+            <p> Email</p> <input class="input" id="iemail" type = "email">
+            <p> Номер телефона</p> <input class="input" id="inumber" type = "text">
+            <p> Пароль </p> <input class="input" id="ipassword" type = "password">
+            <br>
+            <br>
+            <input type="submit"  value="Сохранить" style="margin-left: 0px" class="button">
+        </form>
+    </div>
+</div>
+
+<%- include('./parts/footer.ejs') %>
+
+<script>
+    document.addEventListener("DOMContentLoaded", fill());
+    async function fill(){
+        let resulted = await fetch('../../auth/me');
+        let jsoned = await resulted.json();
+        document.getElementById("iname").value = jsoned.name;
+        document.getElementById("isurname").value = jsoned.surname;
+        document.getElementById("iemail").value = jsoned.email;
+        document.getElementById("inumber").value = jsoned.number;
+        document.getElementById("ipassword").value = jsoned.password;
+    }
+    document.getElementById("formA").addEventListener("submit",onsubmitting);
+    async function onsubmitting() {
+        event.preventDefault();
+        data = {};
+        data["surname"] = document.getElementById("isurname").value;
+        data ["name"] = document.getElementById("iname").value;
+        data ["email"] = document.getElementById("iemail").value;
+        data ["number"] = document.getElementById("inumber").value;
+        data ["password"]= document.getElementById("ipassword").value;
+        if (data.name.length < 2 || data.surname.length < 2) {
+            alert("Проверьте имя и фамилию пж");
+        }
+        var now = new Date();
+        var usdate = new Date(data.dateOfBirth);
+        var daysLag = Math.ceil(Math.abs(now.getTime() - usdate.getTime()) / (1000 * 3600 * 24 * 365));
+        if (daysLag < 6 || usdate > now) {
+            alert("Проверьте дату рождения");
+        }
+        if (data.password.length < 4) {
+            alert("Проверьте должен содержать не менее 4 символов");
+        }
+        if (a == 0) {
+            let aboba = "http://127.0.0.1:4444/user";
+            let json = 'application/json';
+            let res = await fetch(aboba, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': json
+                },
+                body: JSON.stringify(data)
+            });
+        }
+    }
+</script>
+

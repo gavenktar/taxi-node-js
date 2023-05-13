@@ -1,5 +1,96 @@
-<%- include('./parts/header.ejs') %>
-<table class="trips-table">
+<%- include('./parts/header.ejs')%>
+<style>
+
+    *{
+        font-family: "Lora","Arial",serif;
+        font-variant: normal;
+        font-feature-settings: normal;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        display: flex;
+        height: 85vh;
+    }
+
+    .menu {
+        background-color: #EEE;
+        flex: 1;
+        width: 15%;
+        max-width: 15%;
+    }
+
+    .content {
+        background-color: #DDD;
+        flex: 3;
+        justify-content: center;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        padding: 10px;
+        border-bottom: 1px solid #CCC;
+    }
+
+
+    li:last-child {
+        border-bottom: none;
+    }
+
+
+    #form{
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    a {
+        color: #333;
+        text-decoration: none;
+    }
+    a:hover {
+        color: #f65151;
+    }
+
+    li:hover {
+        color: #f65151;
+        cursor: pointer;
+    }
+    font{
+        font-size: 18em;
+    }
+
+    .active {
+        font-color: #f65151;
+    }
+</style>
+<%- include('./parts/part.ejs') %>
+<div class="container">
+    <div class="menu">
+        <ul>
+            <li class="menu-link "><a href="../profile/me" >Изменить данные</a></li>
+            <li class="menu-link active"><a href="../profile/routes" >Просмотреть поездки</a></li>
+            <% if (role === "driver") {%>
+            <li class="menu-link"><a href="../driver/routes">Просмотреть поездки (для водителя)
+                    <% }%>
+                    <% if (role === "admin") {%>
+            <li class="menu-link"><a href="#">Статистика
+                    <% }%>
+            <li class="menu-link"><a href="#">Выйти</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <center class="about__title">Это ваши поездки, вы можете удалить их</center>
+
+        <table class="trips-table">
     <thead>
     <tr>
         <th>Откуда</th>
@@ -9,11 +100,13 @@
         <th>Водитель</th>
         <th>Расстояние</th>
         <th>Цена</th>
+        <th>Удалить</th>
+        <th>Подробнее</th>
     </tr>
     </thead>
     <tbody>
     <% trips.forEach(function(trip) { %>
-        <tr>
+        <tr id="<%=trip.id%>">
             <td><%= trip.from %></td>
             <td><%= trip.to %></td>
             <td><%= trip.time.toLocaleString('en-US', {timeZone: 'Europe/Moscow', hour12: false}).replace(',','') %></td>
@@ -21,35 +114,58 @@
             <td> <%=trip.driverID.name%> <%= trip.driverID.surname%> </td>
             <td><%= trip.distance %></td>
             <td><%= trip.price %></td>
+            <td><a class="button" style="height: 1em; width: 5em" onclick='deletion("<%=trip.id%>")'>Удалить</a> </td>
+            <td><a class="button" style="height: 1em; width: 5em" onclick='showblock("<%=trip.id%>")'>Подробнее</a> </td>
         </tr>
     <% }); %>
     </tbody>
 </table>
+    </div>
+
+<script>
+    async function deletion(dbID){
+        resom = await fetch('http://127.0.0.1:4444/route/'+dbID, {
+            method: 'DELETE',
+        });
+        if (resom.status = 200){
+            alert("Удаление произошло успешно");
+            location.reload();
+        }else{
+            alert(resom.statusMessage);
+        }
+    }
+</script>
 
 
 <style>
     .trips-table {
         border-collapse: collapse;
         width: 100%;
-    }
+        border: 1px solid black;
 
+    }
+    tr {
+        border: 1px #ff6b6b;
+
+    }
     .trips-table th {
         background-color: #f2f2f2;
-        border: 1px solid #ddd;
+        border: 1px solid #ff6b6b;
         padding: 8px;
         text-align: left;
         font-weight: bold;
     }
 
     .trips-table td {
-        border: 1px solid #ddd;
+        border: 1px solid #ff6b6b;
         padding: 8px;
     }
 
-    .trips-table tr:nth-child(even) {
+    .trips-table tr:nth-child(odd) {
         background-color: #f9f9f9;
     }
 
 
 </style>
+</div>
 <%- include('./parts/footer.ejs') %>

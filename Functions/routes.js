@@ -24,13 +24,9 @@ export const createRoute = async (req, res) =>{
     }
 }
 
-
-export const newroute = async (req,res)=>{
-        res.render('pages/newroute');
-}
-export const getRoutes = async (req, res)=>{
+export const driverList = async (req,res)=>{
     try{
-        const routes = await RouteSchema.find().populate('passengerID').populate('driverID').exec();
+        const routes = await RouteSchema.find({driverID : undefined}).populate('passengerID').populate('driverID').exec();
         let data = [];
         let i =0;
         for (let elem of routes){
@@ -47,8 +43,11 @@ export const getRoutes = async (req, res)=>{
                     },
                     driverID: {
                         name: elem.driverID.name || "Не",
-                        surname: elem.driverID.surname || "задан"
-                    }
+                        surname: elem.driverID.surname || "задан",
+                        carModel : elem.driverID.carModel || "-",
+                        carNumber : elem.driverID.carNumber || ""
+                    },
+                    id: elem._id
                 }
             }else{
                 data[i] = {
@@ -63,8 +62,11 @@ export const getRoutes = async (req, res)=>{
                     },
                     driverID: {
                         name: "Не",
-                        surname: "Задан"
-                    }
+                        surname: "Задан",
+                        carModel :  "-",
+                        carNumber :  ""
+                    },
+                    id: elem._id
                 }
             }
 
@@ -78,7 +80,76 @@ export const getRoutes = async (req, res)=>{
                 }
             }
         }
-        res.render('pages/routes',{trips: data});
+        const user = await UserSchema.findById(req.userId);
+        res.render('pages/driverroutes',{trips: data,role: user.role});
+    }catch (e){
+        console.log(e)
+        res.status(500).json({message: "Не удалось получить поездки((",});
+    }
+}
+
+export const newroute = async (req,res)=>{
+        res.render('pages/newroute');
+}
+export const getRoutes = async (req, res)=>{
+    try{
+        const routes = await RouteSchema.find({passengerID : req.userId}).populate('passengerID').populate('driverID').exec();
+        let data = [];
+        let i =0;
+        for (let elem of routes){
+            if (elem.driverID !== undefined) {
+                data[i] = {
+                    from: elem.from,
+                    to: elem.to,
+                    time: elem.time,
+                    distance: elem.distance,
+                    price: elem.price,
+                    passengerID: {
+                        name: elem.passengerID.name,
+                        surname: elem.passengerID.surname
+                    },
+                    driverID: {
+                        name: elem.driverID.name || "Не",
+                        surname: elem.driverID.surname || "задан",
+                        carModel : elem.driverID.carModel || "-",
+                        carNumber : elem.driverID.carNumber || ""
+                    },
+                    id: elem._id
+                }
+            }else{
+                data[i] = {
+                    from: elem.from,
+                    to: elem.to,
+                    time: elem.time,
+                    distance: elem.distance,
+                    price: elem.price,
+                    passengerID: {
+                        name: elem.passengerID.name,
+                        surname: elem.passengerID.surname
+
+                    },
+                    driverID: {
+                        name: "Не",
+                        surname: "Задан",
+                        carModel : "-",
+                        carNumber : ""
+                    },
+                    id: elem._id
+                }
+            }
+
+            i+=1
+        }
+        for (let i=0; i<routes.length;i++){
+            if (routes[i].driverID === undefined){
+                routes[i].driverID = {
+                    name : "Не",
+                    surname : "Задан"
+                }
+            }
+        }
+        const user = await UserSchema.findById(req.userId);
+        res.render('pages/routes',{trips: data,role: user.role});
     }catch (e){
         console.log(e)
         res.status(500).json({message: "Не удалось получить поездки((",});
@@ -89,7 +160,7 @@ export const getRoutesId= async (req, res)=>
 {
     let id = req.params.id;
     try{
-        const routes = await RouteSchema.findById(id);
+        const routes = await RouteSchema.findById(id).populate('passengerID').populate('driverID');
         res.json(routes);
     }catch (e){
         console.log(e)
@@ -99,19 +170,15 @@ export const getRoutesId= async (req, res)=>
 
 export const deleteRoute= async (req, res)=>
 {
-
-
     let id = req.params.id;
     try{
-        if (req.userId !== await RouteSchema.findById(id).passengerID) throw new Error();
+        let passid = await RouteSchema.findById(id).populate('passengerID');
+        let end = passid.passengerID._id.toJSON();
+        if (req.userId !== end  && await UserSchema.findById(req.userId).role!=="admin") throw new Error();
         await RouteSchema.findByIdAndDelete({
             _id:id,
-        },(err,doc)=>{
-            if (err){
-                console.log(e)
-                res.status(500).json({message: "Не удалось удалить поездки((",});
-            }
-        })
+        });
+        res.status(200);
     }catch (e){
         console.log(e)
         res.status(500).json({message: "Не удалось удалить поездки((",});
@@ -138,9 +205,70 @@ export const takeRoute  = async (req,res)=>{
         )
             console.log("deb");
         }
-
+        res.status(200);
     }
     catch (e){
+        res.status(500);
         console.log(e);
+    }
+}
+
+export const adminRoute = async (req, res)=>{
+    try{
+        const routes = await RouteSchema.find().populate('passengerID').populate('driverID').exec();
+        let data = [];
+        let i =0;
+        for (let elem of routes){
+            if (elem.driverID !== undefined) {
+                data[i] = {
+                    from: elem.from,
+                    to: elem.to,
+                    time: elem.time,
+                    distance: elem.distance,
+                    price: elem.price,
+                    passengerID: {
+                        name: elem.passengerID.name,
+                        surname: elem.passengerID.surname
+                    },
+                    driverID: {
+                        name: elem.driverID.name || "Не",
+                        surname: elem.driverID.surname || "задан"
+                    },
+                    id: elem._id
+                }
+            }else{
+                data[i] = {
+                    from: elem.from,
+                    to: elem.to,
+                    time: elem.time,
+                    distance: elem.distance,
+                    price: elem.price,
+                    passengerID: {
+                        name: elem.passengerID.name,
+                        surname: elem.passengerID.surname
+                    },
+                    driverID: {
+                        name: "Не",
+                        surname: "Задан"
+                    },
+                    id: elem._id
+                }
+            }
+
+            i+=1
+        }
+        for (let i=0; i<routes.length;i++){
+            if (routes[i].driverID === undefined){
+                routes[i].driverID = {
+                    name : "Не",
+                    surname : "Задан"
+                }
+            }
+        }
+        const user = await UserSchema.findById(req.userId);
+        res.render('pages/routes',{trips: data,role: user.role});
+    }catch (e){
+        console.log(e)
+        res.status(500).json({message: "Не удалось получить поездки((",});
     }
 }
