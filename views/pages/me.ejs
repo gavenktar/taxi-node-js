@@ -71,20 +71,7 @@
             font-color: #f65151;
         }
     </style>
-<div class="container">
-    <div class="menu">
-        <ul>
-            <li class="menu-link active"><a href="#" >Изменить данные</a></li>
-            <li class="menu-link"><a href="../profile/routes" >Просмотреть поездки</a></li>
-            <% if (role === "driver") {%>
-            <li class="menu-link"><a href="../driver/routes">Просмотреть поездки (для водителя)
-                    <% }%>
-                    <% if (role === "admin") {%>
-            <li class="menu-link"><a href="#">Статистика
-                    <% }%>
-            <li class="menu-link"><a href="#">Выйти</a></li>
-        </ul>
-    </div>
+<%- include('./parts/usermenu.ejs') %>
     <div class="content">
         <form id = "formA" style="align-content: center; border: 1px solid black; height:35em; margin-top: 2em; padding: 1em; border-radius: 1em">
             <p>Имя </p> <input class="input" id="iname" type="text">

@@ -1,7 +1,7 @@
 import mongoose, {mongo} from "mongoose";
 
 
-const RouteSchema = new mongoose.Schema({
+const archiveSchema = new mongoose.Schema({
     from: {
         type: String,
         required: true,
@@ -31,6 +31,12 @@ const RouteSchema = new mongoose.Schema({
         type : Number,
         required : true,
     },
+    status : {
+        type : String
+    },
+    flag:{
+        type : Boolean
+    }
 })
 
-export default mongoose.model('Route',RouteSchema)
+export default mongoose.model('Archive',archiveSchema)

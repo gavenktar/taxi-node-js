@@ -1,0 +1,69 @@
+<%- include('./parts/header.ejs')%>
+<%- include('./parts/part.ejs') %>
+<%- include('./parts/usermenu.ejs') %>
+<div class="content">
+    <center class="about__title">Архив</center>
+
+    <table class="trips-table">
+        <thead>
+        <tr>
+            <th>Откуда</th>
+            <th>Куда</th>
+            <th>Время отправки</th>
+            <th> Пассажир</th>
+            <th>Водитель</th>
+            <th>Расстояние</th>
+            <th>Цена</th>
+            <th>Статус</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% trips.forEach(function(trip) { %>
+        <tr id="<%=trip.id%>">
+            <td><%= trip.from %></td>
+            <td><%= trip.to %></td>
+            <td><%= trip.time.toLocaleString('en-US', {timeZone: 'Europe/Moscow', hour12: false}).replace(',','') %></td>
+            <td> <%=trip.passengerID.name%> <%= trip.passengerID.surname%> </td>
+            <td> <%=trip.driverID.name%> <%= trip.driverID.surname%> </td>
+            <td><%= trip.distance %></td>
+            <td><%= trip.price %></td>
+            <td> <%= trip.status %></td>
+        </tr>
+        <% }); %>
+        </tbody>
+    </table>
+</div>
+
+
+<style>
+    .trips-table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 1px solid black;
+
+    }
+    tr {
+        border: 1px #ff6b6b;
+
+    }
+    .trips-table th {
+        background-color: #f2f2f2;
+        border: 1px solid #ff6b6b;
+        padding: 8px;
+        text-align: left;
+        font-weight: bold;
+    }
+
+    .trips-table td {
+        border: 1px solid #ff6b6b;
+        padding: 8px;
+    }
+
+    .trips-table tr:nth-child(odd) {
+        background-color: #f9f9f9;
+    }
+
+
+</style>
+</div>
+<%- include('./parts/footer.ejs') %>

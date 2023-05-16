@@ -2,12 +2,13 @@ import express from 'express'
 import checkAuth, {returnID} from "./utility/checkAuth.js";
 import mongoose from 'mongoose'
 import {register, login, me,registerdriver, personalprofile, patchUser} from "./Functions/UserFunc.js";
-import {createRoute, getRoutes, getRoutesId, deleteRoute, takeRoute,newroute, driverList, adminRoute} from "./Functions/routes.js";
+import {createRoute, getRoutes, getRoutesId, deleteRoute, takeRoute,newroute, driverList, adminRoute, confirmRoute ,pageConfirmRoute, archivePage} from "./Functions/routes.js";
 import path from 'path'
 import { fileURLToPath } from 'url';
 import UserSchema from "./models/user.js";
 import cookieParser from 'cookie-parser';
 import {profileroutes} from "./Functions/UserFunc.js";
+
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -61,6 +62,14 @@ app.patch ('/route/:routeid',checkAuth,takeRoute);
 app.get('/newroute', newroute);
 app.get ('/admin/routes',checkAuth,adminRoute);
 app.patch('/user',checkAuth,patchUser);
+app.post('/confirmroute/:id',confirmRoute);
+app.get ('/profile/rate',checkAuth,pageConfirmRoute);
+app.get ('/profile/archive',checkAuth,archivePage);
+app.get ('/about',(req, res)=>{res.render('pages/about')})
+app.get ('/contacts',(req, res)=>{res.render('pages/contacts')})
+app.get('/terms', (req,res) => {res.render('pages/terms')})
+app.get('/privacy', (req,res) => {res.render('pages/privacy')})
+
 const dbadress = "mongodb://127.0.0.1:27017/taxi";
 mongoose.connect(dbadress)
     .then(()=>{console.log("БД не упала")})

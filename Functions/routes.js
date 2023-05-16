@@ -3,6 +3,49 @@ import RouteSchema from "../models/route.js";
 import UserModel from "../models/user.js";
 import jwt from "jsonwebtoken";
 import UserSchema from "../models/user.js";
+import UnratedSchema from "../models/unrated.js";
+import ArchiveSchema from "../models/archive.js";
+import Route from "../models/route.js";
+import schedule from 'node-schedule'
+import unrated from "../models/unrated.js";
+import archive from "../models/archive.js";
+
+
+export const moveRoutes = async (req,res)=>{
+    let date = new Date();
+    const routes = await RouteSchema.find().populate('passengerID').populate('driverID').exec();
+    for (let elem of routes){
+        if (elem["time"] < date){
+            if (elem["driverID"]!==undefined && elem["driverID"]!==null){
+                const doc = new UnratedSchema({
+                    from : elem.from,
+                    to : elem.to,
+                    passengerID : elem.passengerID,
+                    driverID: undefined,
+                    time : elem.time,
+                    distance : elem.distance,
+                    price : elem.price,
+                })
+                await RouteSchema.findByIdAndDelete({_id:elem.id});
+                await doc.save();
+            }else{
+                const docx = new ArchiveSchema({
+                    from : elem.from,
+                    to : elem.to,
+                    passengerID : elem.passengerID,
+                    driverID: undefined,
+                    time : elem.time,
+                    distance : elem.distance,
+                    price : elem.price,
+                    status: "Не выполнена",
+                    flag : false
+                })
+                await RouteSchema.findByIdAndDelete({_id:elem.id});
+                await docx.save();
+            }
+        }
+    }
+}
 export const createRoute = async (req, res) =>{
     try{
         const doc = new route({
@@ -31,6 +74,7 @@ export const driverList = async (req,res)=>{
         let i =0;
         for (let elem of routes){
             if (elem.driverID !== undefined) {
+                if (elem.driverID === req.userId) continue;
                 data[i] = {
                     from: elem.from,
                     to: elem.to,
@@ -271,4 +315,157 @@ export const adminRoute = async (req, res)=>{
         console.log(e)
         res.status(500).json({message: "Не удалось получить поездки((",});
     }
+}
+
+
+
+export const  confirmRoute = async (req, res)=>{
+    let status;
+    let message;
+    const route = await UnratedSchema.findById(req.params.id);
+    if (req.body.status === true){
+        status = true;
+        message= "Успешно";
+    }else{
+        status = false;
+        message = "Отклонено пользователем";
+    }
+    try{
+    const docx = new ArchiveSchema({
+        from : route.from,
+        to : route.to,
+        passengerID : route.passengerID,
+        driverID: route.driverID,
+        time : route.time,
+        distance : route.distance,
+        price : route.price,
+        status: message,
+        flag : status
+    })
+    await docx.save();
+    res.status(200);
+    await UnratedSchema.findOneAndDelete({_id:req.params.id});
+        }catch (error){
+        console.log(error);
+        res.status(500);
+    }
+}
+
+
+export const pageConfirmRoute = async (req, res)=>{
+    const routes = await UnratedSchema.find({passengerID : req.userId}).populate('passengerID').populate('driverID').exec();
+    let data = [];
+    let i =0;
+    try{
+    for (let elem of routes){
+        if (elem.driverID !== undefined) {
+            data[i] = {
+                from: elem.from,
+                to: elem.to,
+                time: elem.time,
+                distance: elem.distance,
+                price: elem.price,
+                passengerID: {
+                    name: elem.passengerID.name,
+                    surname: elem.passengerID.surname
+                },
+                driverID: {
+                    name: elem.driverID.name || "Не",
+                    surname: elem.driverID.surname || "задан",
+                    carModel : elem.driverID.carModel || "-",
+                    carNumber : elem.driverID.carNumber || ""
+                },
+                id: elem._id
+            }
+        }else{
+            data[i] = {
+                from: elem.from,
+                to: elem.to,
+                time: elem.time,
+                distance: elem.distance,
+                price: elem.price,
+                passengerID: {
+                    name: elem.passengerID.name,
+                    surname: elem.passengerID.surname
+
+                },
+                driverID: {
+                    name: elem.driverID.name || "Не",
+                    surname: elem.driverID.surname || "задан",
+                    carModel : elem.driverID.carModel || "-",
+                    carNumber : elem.driverID.carNumber || ""
+                },
+                id: elem._id
+            }
+        }
+
+        i+=1
+    }
+    const user = await UserSchema.findById(req.userId);
+    res.render('pages/rate',{trips: data,role: user.role});
+}catch (e){
+    console.log(e)
+    res.status(500).json({message: "Не удалось получить поездки((",});
+}
+}
+const task = schedule.scheduleJob('*/15 * * * *',moveRoutes);
+
+export const archivePage = async (req,res)=>{
+    const routes = await ArchiveSchema.find({
+        $or : [
+            {passengerID : req.userId
+            },
+            {driverID : req.userId}
+        ]
+    }).populate('driverID').populate('passengerID').exec();
+    let data = [];
+    let i=0;
+    for (let elem of routes){
+        if (elem.driverID !== undefined) {
+            data[i] = {
+                from: elem.from,
+                to: elem.to,
+                time: elem.time,
+                distance: elem.distance,
+                price: elem.price,
+                passengerID: {
+                    name: elem.passengerID.name,
+                    surname: elem.passengerID.surname
+                },
+                driverID: {
+                    name: elem.driverID.name || "Не",
+                    surname: elem.driverID.surname || "задан",
+                    carModel : elem.driverID.carModel || "-",
+                    carNumber : elem.driverID.carNumber || ""
+                },
+                id: elem._id,
+                status:elem.status
+            }
+        }else{
+            data[i] = {
+                from: elem.from,
+                to: elem.to,
+                time: elem.time,
+                distance: elem.distance,
+                price: elem.price,
+                passengerID: {
+                    name: elem.passengerID.name,
+                    surname: elem.passengerID.surname
+
+                },
+                driverID: {
+                    name: "Не",
+                    surname: "Задан",
+                    carModel : "-",
+                    carNumber : ""
+                },
+                status:elem.status,
+                id: elem._id
+            }
+        }
+
+        i+=1
+    }
+    const user = await UserSchema.findById(req.userId);
+    res.render('pages/archive',{trips: data,role: user.role});
 }

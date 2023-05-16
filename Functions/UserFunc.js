@@ -15,23 +15,16 @@ export const personalprofile = async (req, res)=>{
 
 export const patchUser = async (req, res)=>{
     try {
-        const user = await UserSchema.findById(req.id);
+        const user = await UserSchema.findById(req.userId);
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hashpassword = await bcrypt.hash(password, salt);
-        UserSchema.updateOne({
-                id: req.id
-            },
-            {
-                $set: {
-                    name: req.body.name,
-                    surname: req.body.surname,
-                    number: req.body.number,
-                    email: req.body.email,
-                    password : hashpassword
-                }
-            }
-            )
+        user.name = req.body.name;
+        user.surname = req.body.surname;
+        user.number = req.body.number;
+        user.email = req.body.email;
+        user.password = hashpassword;
+        await user.save();
         res.status(200);
     }catch (error){
         res.status (404);
@@ -151,7 +144,6 @@ export const me = async (req,res)=>{
     }catch(err){
 
         res.status(404);
-        res.message("NOT FOUND");
     }
 }
 

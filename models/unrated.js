@@ -1,7 +1,7 @@
 import mongoose, {mongo} from "mongoose";
 
 
-const RouteSchema = new mongoose.Schema({
+const UnratedSchema = new mongoose.Schema({
     from: {
         type: String,
         required: true,
@@ -33,4 +33,4 @@ const RouteSchema = new mongoose.Schema({
     },
 })
 
-export default mongoose.model('Route',RouteSchema)
+export default mongoose.model('Unrated',UnratedSchema)

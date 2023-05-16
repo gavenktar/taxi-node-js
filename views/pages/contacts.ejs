@@ -1,0 +1,73 @@
+<%- include('./parts/header.ejs')%>
+<style>
+    .container {
+        height: 680px;
+        margin: 0 auto;
+        padding: 0 20px;
+
+    }
+
+
+
+    h1 {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    nav li {
+        margin: 0 10px;
+    }
+
+    nav a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    /* Contact styles */
+    section#contact {
+        margin: 50px 0;
+    }
+
+    h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .contact-info {
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+</style>
+
+<section id="contact">
+    <h2>Контакты</h2>
+    <div class="container">
+        <div class="contact-info">
+            <h3>Адрес:</h3>
+            <p>ул. Ленина, 10, г. Минск</p>
+        </div>
+        <div class="contact-info">
+            <h3>Телефон:</h3>
+            <p>+375 555555555</p>
+        </div>
+        <div class="contact-info">
+            <h3>Email:</h3>
+            <p>info@taxi-site.ru</p>
+        </div>
+    </div>
+</section>
+<%- include('./parts/footer.ejs')%>

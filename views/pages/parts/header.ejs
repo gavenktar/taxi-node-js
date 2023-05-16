@@ -9,9 +9,9 @@
 <header>
     <%- include('reg.ejs') %>
     <nav class="navbar">
-       <a onclick="makerequest('auth/me')" class="navbar__logo"> <img src="/img/logo.png" alt="Главная" width="120px"></a>
-        <a onclick="makerequest('/')" class="navbar__link">О нас</a>
-        <a onclick="makerequest('newroute')" class="navbar__link">Заказать авто</a>
+       <a onclick="makerequest('/')" class="navbar__logo"> <img src="/img/logo.png" alt="Главная" width="120px"></a>
+        <a onclick="makerequest('/about')" class="navbar__link">О нас</a>
+        <a onclick="makerequest('/newroute')" class="navbar__link">Заказать авто</a>
     </nav>
     <nav id="loginbuttons" class = "navbar1">
         <a onclick="show()" class="navbar__link navbar__link--login">Войти/Зарегистрироваться</a>
@@ -19,7 +19,7 @@
     </nav>
             <a onclick="makerequest('/profile/me')" id="usermenu" style="display: none" class = "navbar__link navbar__link--login"></a>
 </header>
-
+<div id="maincontent">
 
 <script>
 
