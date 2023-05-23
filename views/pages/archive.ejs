@@ -4,7 +4,7 @@
 <div class="content">
     <center class="about__title">Архив</center>
 
-    <table class="trips-table">
+    <table id="roads" class="trips-table">
         <thead>
         <tr>
             <th>Откуда</th>
@@ -15,6 +15,20 @@
             <th>Расстояние</th>
             <th>Цена</th>
             <th>Статус</th>
+        </tr>
+        <tr>
+            <td>
+                <input type="text"  id="fromtext"  placeholder="Откуда">
+            </td>
+            <td>
+                <input type="text"  id="totext" placeholder="Куда">
+            </td>
+            <td><input type="text"  id="timetext" placeholder="Время"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         </thead>
         <tbody>
@@ -29,6 +43,7 @@
             <td><%= trip.price %></td>
             <td> <%= trip.status %></td>
         </tr>
+
         <% }); %>
         </tbody>
     </table>
@@ -66,4 +81,49 @@
 
 </style>
 </div>
+
+<script>
+    const fromInput = document.getElementById('fromtext');
+    const toInput = document.getElementById('totext');
+    const timeInput = document.getElementById('timetext');
+    const roadsTable = document.getElementById('roads')
+    fromInput.addEventListener('input', updateTable);
+    toInput.addEventListener('input', updateTable);
+    async function updateTable(){
+        let from =fromInput.value;
+        let to = toInput.value;
+        let time = timeInput.value;
+        const Childs = roadsTable.children;
+        for (let i = Childs.length - 1; i >= 1; i--) {
+            const child = Childs[i];
+            child.remove();
+        }
+        const tbody = document.createElement('tbody');
+        roadsTable.appendChild(tbody);
+        fetch('/updateArchiveRoutes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ from, to,time }),
+        }).then(response=>response.json()) .then(data=>{
+            data.forEach (road=>{
+                let roadsTable1 = roadsTable.tBodies[0];
+                let row = roadsTable1.insertRow();
+                row.id = road.id;
+                const dateTime = new Date(road.time);
+                const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+                const formattedDateTime = dateTime.toLocaleString('en-US', options);
+                let line = '<td>'+road.from + '</td>'+
+                    '<td>' + road.to + '</td>'+
+                    '<td>' + formattedDateTime + '</td>'+
+                    '<td>' + road.passengerID.name + road.passengerID.surname + '</td>'+
+                    '<td>'  + road.driverID.name + road.driverID.surname + '</td>'+
+                    '<td>' + road.distance +'</td>'+
+                    '<td>'+ road.price+ '</td>'+ '<td>' + road.status+ '</td>'
+                row.innerHTML = line;
+            })
+        })
+    }
+</script>
 <%- include('./parts/footer.ejs') %>

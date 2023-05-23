@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 
 import jwt from 'jsonwebtoken'
 import UserSchema from "../models/user.js";
+import RouteSchema from "../models/route.js";
 
 
 
@@ -55,12 +56,13 @@ export const register = async (req,res)=>{
         const token = jwt.sign({
             _id: user._id,
         },'aboba')
+        res.cookie('name', user.toJSON().name);
+        res.cookie('jwt',token);
         res.json({
             ...user.toJSON(),
             token});
         res.status(200);
-        res.cookie('name', user.toJSON().name);
-        res.cookie('jwt',token);
+
     }catch (err){
         res.status(500).json({message: "Не удалось зарегистрироваться((",});
 
@@ -147,7 +149,27 @@ export const me = async (req,res)=>{
     }
 }
 
+export const moderateUsers = async (req,res)=>{
+    const user = await UserSchema.findById(req.userId);
+    if (user.role !== "admin") return;
+    const users = await UserSchema.find();
+    res.render('pages/moderate',{role : user.role, users : users});
+}
 
+
+export const deleteUser= async (req, res)=>
+{
+    let id = req.params.id;
+    try{
+        await RouteSchema.findByIdAndDelete({
+            _id:id,
+        });
+        res.status(200);
+    }catch (e){
+        console.log(e)
+        res.status(500).json({message: "Не удалось удалить пользователя((",});
+    }
+}
 export const stats = async (req, res)=>{
 
 }

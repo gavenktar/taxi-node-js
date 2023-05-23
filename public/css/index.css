@@ -2,9 +2,14 @@
 
 body{
     margin: 0px;
-    position: absolute;
-    height: 100%;
-    width: 100%;
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+#maincontent{
+    flex-grow: 2;
 }
 
 #gray{
@@ -45,6 +50,11 @@ body{
     cursor: pointer;
 }
 
+#changediv{
+    width: 100vh;
+    display: flex;
+    justify-content: center;
+}
 
 .form{
     text-align: center;
@@ -76,6 +86,7 @@ body{
 }
 
 footer {
+    flex-shrink: 0; /* Запрет уменьшения высоты header и footer */
     background-color: #2b2d42;
     color: #fff;
     padding: 20px;
@@ -118,7 +129,12 @@ footer {
     opacity: 1;
 }
 
+canvas{
+    max-height: 500px;
+}
+
 header {
+    flex-shrink: 0; /* Запрет уменьшения высоты header и footer */
     display: flex;
     justify-content: space-between;
     align-items: center;

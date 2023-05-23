@@ -12,12 +12,13 @@
 
     .container {
         display: flex;
-        height: 85vh;
+        min-height: 85vh;
+        max-height: 200`vh;
     }
 
     .menu {
+        flex-shrink: 0;
         background-color: #EEE;
-        flex: 1;
         width: 15%;
         max-width: 15%;
     }
@@ -81,12 +82,28 @@
             <li class="menu-link"><a href="../profile/routes" >Просмотреть запланированные поездки</a></li>
             <li class="menu-link"><a href="../profile/rate" >Оценить поездки</a></li>
             <li class="menu-link"><a href="../profile/archive" >Архив поездок</a></li>
+            <li class="menu-link"><a href="../profile/stats">Статистика</li>
             <% if (role === "driver") {%>
             <li class="menu-link"><a href="../driver/routes">Просмотреть поездки (для водителя)
                     <% }%>
                     <% if (role === "admin") {%>
-            <li class="menu-link"><a href="#">Статистика
+                    <li class="menu-link"><a href="../profile/moderate">Меню управления пользователями</a></li>
+            <li class="menu-link"><a href="../profile/change">Изменение коэффициентов</a></li>
                     <% }%>
-            <li class="menu-link"><a href="#">Выйти</a></li>
+            <li class="menu-link"><a onclick="exit()">Выйти</a></li>
         </ul>
     </div>
+
+    <script>
+        async function exit(){
+            var cookies = document.cookie.split(";");
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i];
+                var eqPos = cookie.indexOf("=");
+                var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+            }
+            location.href = "/";
+
+        }
+    </script>

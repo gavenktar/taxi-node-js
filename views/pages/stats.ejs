@@ -1,0 +1,166 @@
+<%- include('./parts/header.ejs')%>
+<%- include('./parts/part.ejs') %>
+<%- include('./parts/usermenu.ejs') %>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .stats-div{
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .stats-child{
+        flex-grow: 1;
+        margin-right: 1%;
+        max-height: 60%;
+        max-width: 50vh;
+        margin-top: 2vh;
+        min-height: 40%;
+    }
+</style>
+<div class ="stats-div">
+    <div class="stats-child">
+<center class="about__title">График вашей статистики</center>
+        <% if (true)  { %>
+            <canvas id="myChart" ></canvas>
+        <% }; %>
+</div>
+
+    <div class="stats-child">
+        <center class="about__title">Немножечко в цифрах</center>
+        <br>
+        Общее количество поездок: <%= active.length + archive.length + failed.length%>
+        <br>
+        Количество активных поездок: <%= active.length %>
+        <br>
+        Количество успешно завершенных поездок: <%=  succ %>
+        <br>
+        Количество проваленных поездок: <%= failed.length%>
+        <br>
+        Доля успешных поездок: <%= succ / (archive.length) *100%>%
+    </div>
+    <% if (role !== "passenger" && revenue.length>0) {%>
+        <div class="stats-child">
+            <center class="about__title">Прибыль по дням</center>
+            <canvas id="revenueChart"></canvas>
+        </div>
+    <% }; %>
+    <% if (role === "admin") {%>
+        <div class="stats-child" style="max-width: 100vh">
+        <center class = "about__title">Динамика количества выполненных заказов</center>
+        <canvas id="archiveChart"></canvas>
+        </div>
+    <% };%>
+
+</div>
+
+<%- include ('./parts/footer.ejs')%>
+
+
+<script>
+    var data = {
+        labels: ['Активные', 'Успешные', 'Отмененные'],
+        datasets: [{
+            data: [<%= active.length %>,<%= succ%>,<%=failed.length %>],
+            backgroundColor: ['#ff6384', '#36a2eb', '#ffce56'],
+            hoverBackgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
+        }]
+    };
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    <% if ( role!=="passenger"){ %>
+    let array = [];
+    <% if (revenue.length != 0){%>
+    <% revenue.forEach(function(rev) { %>
+    array.push(
+        {
+            date : "<%= rev._id%>",
+            totalValue : "<%= rev.totalValue%>"
+        }
+    )
+    <% }); %>
+    <% }; %>
+    var dates = array.map(obj => obj.date);
+    var values = array.map(obj => obj.totalValue);
+     data = {
+        labels: dates,
+        datasets: [{
+            label: 'Прибыль',
+            data: values,
+            backgroundColor: 'rgba(75, 192, 192, 0.5)', // Цвет заливки столбцов
+            borderColor: 'rgba(75, 192, 192, 1)', // Цвет границ столбцов
+            borderWidth: 1 // Ширина границ столбцов
+        }]
+    };
+
+     options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    };
+
+    var ctx = document.getElementById('revenueChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: options
+    });
+    <% } %>
+    <% if (role === "admin"){ %>
+     array = [];
+     <% if (succ > 0){%>
+    <% success.forEach(function(suc) { %>
+    array.push(
+        {
+            date : "<%= suc._id%>",
+            quantity : "<%= suc.totalValue%>"
+        }
+    )
+    <% }); %>
+
+    <% }; %>
+    var dates = array.map(obj => obj.date);
+    var values = array.map(obj => obj.quantity);
+    data = {
+        labels: dates,
+        datasets: [{
+            label: 'Количество выполненных заказов',
+            data: values,
+            backgroundColor: 'rgba(75, 192, 192, 0.5)', // Цвет заливки столбцов
+            borderColor: 'rgba(75, 192, 192, 1)', // Цвет границ столбцов
+            borderWidth: 1 // Ширина границ столбцов
+        }]
+    };
+
+    options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    };
+
+    var ctx = document.getElementById('archiveChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: options
+    });
+    <%}%>
+</script>

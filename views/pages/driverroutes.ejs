@@ -5,18 +5,33 @@
 
      <div class="content">
          <center class="about__title">Поездки с ненайденными водителями</center>
-         <table class="trips-table">
+         <table id="roads" class="trips-table">
              <thead>
              <tr>
                  <th>Откуда</th>
                  <th>Куда</th>
                  <th>Время отправки</th>
-                 <th> Пассажир</th>
+                 <th>Пассажир</th>
                  <th>Водитель</th>
                  <th>Расстояние</th>
                  <th>Цена</th>
                  <th>Занять</th>
                  <th>Подробнее</th>
+             </tr>
+             <tr>
+                 <td>
+                     <input type="text"  id="fromtext"  placeholder="Откуда">
+                 </td>
+                 <td>
+                     <input type="text"  id="totext" placeholder="Куда">
+                 </td>
+                 <td><input type="text"  id="timetext" placeholder="Время"></td>
+                 <td></td>
+                 <td></td>
+                 <td></td>
+                 <td></td>
+                 <td></td>
+                 <td></td>
              </tr>
              </thead>
              <tbody>
@@ -80,7 +95,9 @@
          .trips-table tr:nth-child(odd) {
              background-color: #f9f9f9;
          }
-
+         td{
+             max-width: 400px;
+         }
 
      </style>
  </div>
@@ -91,13 +108,61 @@
         resom = await fetch('http://127.0.0.1:4444/route/'+dbID, {
             method: 'PATCH',
         });
-        if (resom.status = 200){
+        location.reload();
+        if (resom.json.status === 200){
             alert("Вы успешно заняли поездку");
             location.reload();
         }else{
             alert(resom.statusMessage);
         }
+        location.reload()
     }
+
+    const fromInput = document.getElementById('fromtext');
+    const toInput = document.getElementById('totext');
+    const timeInput = document.getElementById('timetext');
+    const roadsTable = document.getElementById('roads')
+    fromInput.addEventListener('input', updateTable);
+    toInput.addEventListener('input', updateTable);
+    async function updateTable(){
+        let from =fromInput.value;
+        let to = toInput.value;
+        let time = timeInput.value;
+        const Childs = roadsTable.children;
+        for (let i = Childs.length - 1; i >= 1; i--) {
+            const child = Childs[i];
+            child.remove();
+        }
+        const tbody = document.createElement('tbody');
+        roadsTable.appendChild(tbody);
+        fetch('/updateRoutes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ from, to,time }),
+        }).then(response=>response.json()) .then(data=>{
+            data.forEach (road=>{
+                let roadsTable1 = roadsTable.tBodies[0];
+                row.id = road.id;
+
+                let row = roadsTable1.insertRow();
+                const dateTime = new Date(road.time);
+                const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+                const formattedDateTime = dateTime.toLocaleString('en-US', options);
+                let line = '<td>'+road.from + '</td>'+
+                '<td>' + road.to + '</td>'+
+                '<td>' + formattedDateTime + '</td>'+
+                '<td>' + road.passengerID.name + road.passengerID.surname + '</td>'+
+                '<td>'  + road.driverID.name + road.driverID.surname + '</td>'+
+                '<td>' + road.distance +'</td>'+
+                '<td>'+ road.price+ '</td>'+ '<td>' + '<a class="button" style="height: 1em; width: 5em" onclick="takeRoute(\'' + road.id + '\')">Занять поездку</a></td>' + '<td><a class="button" style="height: 1em; width: 5em" onclick="showblock(\'' + road.id + '\')">Подробнее</a></td>'
+                row.innerHTML = line;
+            })
+        })
+
+    }
+
 </script>
 
 

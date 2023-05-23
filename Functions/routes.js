@@ -9,8 +9,166 @@ import Route from "../models/route.js";
 import schedule from 'node-schedule'
 import unrated from "../models/unrated.js";
 import archive from "../models/archive.js";
+import CfSchema from "../models/cf.js"
+import mongoose from 'mongoose';
+
+export const updateArchiveRoutes = async (req,res)=>{
+    const { from, to, time } = req.body;
+    const conditions = {};
+    const User = await UserSchema.findById(req.userId);
+    if (User.role === "passenger"){
+        conditions.passengerID = new mongoose.Types.ObjectId(req.userId);
+    }else{
+        if (User.role === "driver") conditions.driverID = undefined;
+    }
+    if (from) {
+        conditions.from = { $regex: from, $options: 'i' };
+    }
+    if (to) {
+        conditions.to = { $regex: to, $options: 'i' };
+    }
+    if (time){
+        conditions.time = {$gte : time};
+    }
+    const roads = await ArchiveSchema.find(conditions).populate('passengerID').populate('driverID');
+    let data = [];
+    let i =0;
+    for (let elem of roads){
+        if (elem.driverID !== null && elem.driverID !== undefined) {
+            data[i] = {
+                from: elem.from,
+                to: elem.to,
+                time: elem.time,
+                distance: elem.distance,
+                price: elem.price,
+                passengerID: {
+                    name: elem.passengerID.name,
+                    surname: elem.passengerID.surname
+                },
+                driverID: {
+                    name: elem.driverID.name || "Не",
+                    surname: elem.driverID.surname || "задан",
+                    carModel : elem.driverID.carModel || "-",
+                    carNumber : elem.driverID.carNumber || ""
+                },
+                id: elem._id,
+                status : elem.status
+            }
+        }else{
+            data[i] = {
+                from: elem.from,
+                to: elem.to,
+                time: elem.time,
+                distance: elem.distance,
+                price: elem.price,
+                passengerID: {
+                    name: elem.passengerID.name,
+                    surname: elem.passengerID.surname
+
+                },
+                driverID: {
+                    name: "Не",
+                    surname: "Задан",
+                    carModel : "-",
+                    carNumber : ""
+                },
+                id: elem._id,
+                status : elem.status
+            }
+        }
+
+        i+=1
+    }
+    res.json(data);
+}
 
 
+
+export const updateRoutes = async (req,res)=>{
+    const { from, to, time } = req.body;
+    const conditions = {};
+    const User = await UserSchema.findById(req.userId);
+    if (User.role === "passenger"){
+        conditions.passengerID = new mongoose.Types.ObjectId(req.userId);
+    }else{
+        if (User.role === "driver") conditions.driverID = undefined;
+    }
+    if (from) {
+        conditions.from = { $regex: from, $options: 'i' };
+    }
+    if (to) {
+        conditions.to = { $regex: to, $options: 'i' };
+    }
+    if (time){
+        conditions.time = {$gte : time};
+    }
+    const roads = await RouteSchema.find(conditions).populate('passengerID').populate('driverID');
+    let data = [];
+    let i =0;
+    for (let elem of roads){
+        if (elem.driverID !== null && elem.driverID !== undefined) {
+            data[i] = {
+                from: elem.from,
+                to: elem.to,
+                time: elem.time,
+                distance: elem.distance,
+                price: elem.price,
+                passengerID: {
+                    name: elem.passengerID.name,
+                    surname: elem.passengerID.surname
+                },
+                driverID: {
+                    name: elem.driverID.name || "Не",
+                    surname: elem.driverID.surname || "задан",
+                    carModel : elem.driverID.carModel || "-",
+                    carNumber : elem.driverID.carNumber || ""
+                },
+                id: elem._id
+            }
+        }else{
+            data[i] = {
+                from: elem.from,
+                to: elem.to,
+                time: elem.time,
+                distance: elem.distance,
+                price: elem.price,
+                passengerID: {
+                    name: elem.passengerID.name,
+                    surname: elem.passengerID.surname
+
+                },
+                driverID: {
+                    name: "Не",
+                    surname: "Задан",
+                    carModel : "-",
+                    carNumber : ""
+                },
+                id: elem._id
+            }
+        }
+
+        i+=1
+    }
+       res.json(data);
+}
+export const changeCF = async (req,res)=>{
+    const user = await UserSchema.findById(req.userId);
+    if (user.role !== "admin"){
+        res.render('index.ejs')
+        return
+    }
+    let coeff = await CfSchema.findOne();
+    let cf =[]
+     cf = await CfSchema.find();
+    if (coeff === null){
+        coeff = {
+            timeCF:0.3,
+            cmCF : 0.1
+        }
+        cf = []
+    }
+    res.render('pages/change.ejs',{role: user.role, timeCF : coeff.timeCF, cmCF : coeff.cmCF, cfArray:cf});
+}
 export const moveRoutes = async (req,res)=>{
     let date = new Date();
     const routes = await RouteSchema.find().populate('passengerID').populate('driverID').exec();
@@ -117,7 +275,7 @@ export const driverList = async (req,res)=>{
             i+=1
         }
         for (let i=0; i<routes.length;i++){
-            if (routes[i].driverID === undefined){
+            if (routes[i].driverID === undefined && routes[i].driverID === null){
                 routes[i].driverID = {
                     name : "Не",
                     surname : "Задан"
@@ -137,11 +295,24 @@ export const newroute = async (req,res)=>{
 }
 export const getRoutes = async (req, res)=>{
     try{
-        const routes = await RouteSchema.find({passengerID : req.userId}).populate('passengerID').populate('driverID').exec();
+        const user = await UserSchema.findById(req.userId);
+        let routes
+        if (user.role !== "admin") {
+            routes = await RouteSchema.find({
+                $or : [
+                    {passengerID : req.userId
+                    },
+                    {driverID : req.userId}
+                ]
+            }).populate('driverID').populate('passengerID').exec();
+
+        }else{
+            routes = await ArchiveSchema.find().populate('driverID').populate('passengerID').exec();
+        }
         let data = [];
         let i =0;
         for (let elem of routes){
-            if (elem.driverID !== undefined) {
+            if (elem.driverID !== undefined && elem.driverID !== null) {
                 data[i] = {
                     from: elem.from,
                     to: elem.to,
@@ -192,7 +363,6 @@ export const getRoutes = async (req, res)=>{
                 }
             }
         }
-        const user = await UserSchema.findById(req.userId);
         res.render('pages/routes',{trips: data,role: user.role});
     }catch (e){
         console.log(e)
@@ -351,9 +521,118 @@ export const  confirmRoute = async (req, res)=>{
     }
 }
 
+export const giveStats = async (req,res)=>{
+    const user = await UserSchema.findById(req.userId);
+    let sum  =0 ;
+
+    let active = [];
+    let success = [];
+    let archive = [];
+    let failed = [];
+    let unrated = [];
+    let revenue;
+    let lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth()-1);
+    if (user.role === "passenger"){
+        active = await RouteSchema.find({passengerID : req.userId});
+        failed = await ArchiveSchema.find({flag : false, passengerID : req.userId});
+        archive = await ArchiveSchema.find ({flag : true, passengerID : req.userId});
+    }
+    if (user.role === "driver"){
+        active = await RouteSchema.find({driverID : req.userId});
+        failed = await ArchiveSchema.find({flag : false, driverID : req.userId});
+        archive = await ArchiveSchema.find ({flag : true, driverID : req.userId});
+        revenue = await ArchiveSchema.aggregate([
+            {
+                $match: {
+                    time: {$gte: lastMonth, $lt: new Date()},
+                    driverID : req.userId
+                }
+            },
+            {
+                $group: {
+                    _id: {$dateToString: {format: "%Y-%m-%d", date: "$time"}},
+                    totalValue: {$sum: "$price"}
+                }
+            }
+        ]);
+    }
+    if (user.role === "admin" ) {
+        active = await RouteSchema.find();
+        failed = await ArchiveSchema.find({flag: false});
+        archive = await ArchiveSchema.find ({flag : true});
+
+        success = await  ArchiveSchema.aggregate([
+            {
+                $match: {
+                    flag : true,
+                }
+            },
+            {
+                $group: {
+                    _id: {$dateToString: {format: "%Y-%m-%d", date: "$time"}},
+                    totalValue: {$sum: 1}
+                }
+            }
+        ]);
+        revenue = await ArchiveSchema.aggregate([
+            {
+                $match: {
+                    time: {$gte: lastMonth, $lt: new Date()},
+                    flag:true
+                }
+            },
+            {
+                $group: {
+                    _id: {$dateToString: {format: "%Y-%m-%d", date: "$time"}},
+                    totalValue: {$sum: "$price"}
+                }
+            }
+        ]);
+        success.forEach(function(obj) {
+            // Получение значения поля и добавление его к сумме
+            sum += obj.totalValue;
+        });
+    }
+
+
+    try{
+    if (user.role !== "passenger") {
+        for (let date = lastMonth; date <= new Date(); date.setDate(date.getDate() + 1)) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            if (revenue.some(item => item.date === formattedDate)) {
+                continue;
+            } else {
+                revenue.push(
+                    {
+                        _id: formattedDate,
+                        totalValue: 0
+                    }
+                );
+            }
+        }
+        revenue.sort((a, b) => new Date(a._id) - new Date(b._id));
+
+    }
+    }catch(error){}
+    success.sort((a, b) => new Date(a._id) - new Date(b._id));
+
+
+    res.render('pages/stats',{active: active,failed: failed, success : success, role: user.role, revenue: revenue, archive: archive, succ : sum });
+
+};
 
 export const pageConfirmRoute = async (req, res)=>{
-    const routes = await UnratedSchema.find({passengerID : req.userId}).populate('passengerID').populate('driverID').exec();
+    let routes;
+    const user = await UserSchema.findById(req.userId);
+    if (user.role !== "admin") {
+        routes = await UnratedSchema.find({passengerID: req.userId}).populate('passengerID').populate('driverID').exec();
+    }else{
+        routes =await UnratedSchema.find().populate('passengerID').populate('driverID').exec();
+    }
     let data = [];
     let i =0;
     try{
@@ -401,7 +680,7 @@ export const pageConfirmRoute = async (req, res)=>{
 
         i+=1
     }
-    const user = await UserSchema.findById(req.userId);
+
     res.render('pages/rate',{trips: data,role: user.role});
 }catch (e){
     console.log(e)
@@ -411,13 +690,19 @@ export const pageConfirmRoute = async (req, res)=>{
 const task = schedule.scheduleJob('*/15 * * * *',moveRoutes);
 
 export const archivePage = async (req,res)=>{
-    const routes = await ArchiveSchema.find({
+    let routes;
+    const user = await UserSchema.findById(req.userId);
+    if (user.role!== "admin"){
+    routes = await ArchiveSchema.find({
         $or : [
             {passengerID : req.userId
             },
             {driverID : req.userId}
         ]
     }).populate('driverID').populate('passengerID').exec();
+        }else{
+        routes = await ArchiveSchema.find().populate('driverID').populate('passengerID').exec();
+    }
     let data = [];
     let i=0;
     for (let elem of routes){
@@ -466,6 +751,22 @@ export const archivePage = async (req,res)=>{
 
         i+=1
     }
-    const user = await UserSchema.findById(req.userId);
     res.render('pages/archive',{trips: data,role: user.role});
+}
+
+export const createCF =async (req, res)=>{
+    const User = await UserSchema.findById(req.userId);
+    if (User.role !== "admin") return;
+    try {
+        const doc = new CfSchema({
+            date: new Date(),
+            timeCF: req.body.timeCF,
+            cmCF: req.body.cmCF
+        })
+        await doc.save();
+        res.status(200);
+    }catch (error){
+        console.log(error);
+        res.status(500);
+    }
 }

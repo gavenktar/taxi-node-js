@@ -1,0 +1,99 @@
+<%- include('./parts/header.ejs')%>
+<%- include('./parts/usermenu.ejs')%>
+
+
+
+<div id="changediv">
+    <form class="form" id="changeform" style="padding: 1vh; margin-top: 1vh; border:1px solid black;height: 25vh; border-radius: 15px; ">
+        <center class="about__title"> Введите новые коэффцициенты</center>
+        Цена/min
+        <input class="input" id ="cfcm" value="<%= cmCF%>" type="text">
+        <br>
+        Цена/1км
+        <input class="input"  style="margin-bottom: 1vh" id="cfm" value="<%= timeCF%>" type ="text">
+        <br>
+        <input class="input" type ="submit" class="button" value="Отправить">
+    </form>
+    <% if (cfArray.length > 1) {%>
+    <div>
+        <center class="about__title">График коэффициентов</center>
+        <canvas id="graph"></canvas>
+    </div>
+    <% };%>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    <% if (cfArray.length > 1) {%>
+    let array = [];
+    <% cfArray.forEach(function(rev) { %>
+    array.push(
+        {
+            date : "<%= rev.date%>",
+            time : "<%= rev.timeCF%>",
+            cm : "<%= rev.cmCF%>"
+        }
+    )
+    <% }); %>
+    var ctx = document.getElementById('graph').getContext('2d');
+
+    var dates = array.map(obj => obj.date);
+    var timeCF = array.map(obj => obj.time);
+    var cmCF = array.map(obj => obj.cm);
+
+    let data = {
+        labels: dates,
+        datasets: [{
+            label: 'Динамика коэффициентов',
+            data: timeCF,cmCF,
+            backgroundColor: 'rgba(75, 192, 192, 0.5)', // Цвет заливки столбцов
+            borderColor: 'rgba(75, 192, 192, 1)', // Цвет границ столбцов
+            borderWidth: 1 // Ширина границ столбцов
+        }]
+    };
+
+    options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    };
+
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: options
+    });
+
+    <% } %>
+    let cfElement = document.getElementById("changeform");
+    cfElement.addEventListener('submit',changeCF);
+    async function changeCF(){
+        event.preventDefault();
+        let formData =new FormData(cfElement);
+        let formCF = {
+            timeCF : document.getElementById("cfcm").value,
+            cmCF : document.getElementById("cfm").value
+        };
+        let json = 'application/json';
+        let res = await fetch('/profile/changecf',{
+            method : 'POST',
+            headers:{
+                'Content-Type' : json
+            },
+            body:JSON.stringify(formCF)
+        });
+        const result = await res.json();
+        if (result.status === 200){
+            alert("Успешно");
+        }else{
+            alert("Произошла ошибка");
+        }
+    }
+</script>
+
+<%- include('./parts/footer.ejs') %>
